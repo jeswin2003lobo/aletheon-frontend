@@ -12,7 +12,7 @@ import { displayValue, signalDisplayName, truncateHash } from '../utils/formatte
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { Check, AlertCircle } from 'lucide-react';
 
-const TABS = ['Evaluation', 'Thresholds', 'Feedback', 'Notifications', 'Holidays'];
+const TABS = ['Evaluation', 'Thresholds', 'Feedback', 'Notifications', 'Holidays', 'Deployment'];
 
 export default function Settings() {
   const [activeTab, setActiveTab] = useState('Evaluation');
@@ -38,6 +38,7 @@ export default function Settings() {
       {activeTab === 'Feedback' && <FeedbackTab />}
       {activeTab === 'Notifications' && <NotificationsTab />}
       {activeTab === 'Holidays' && <HolidaysTab />}
+      {activeTab === 'Deployment' && <DeploymentTab />}
     </div>
   );
 }
@@ -429,6 +430,139 @@ function HolidaysTab() {
         {cacheStats && (
           <p className="text-xs text-[#808080] font-mono">{cacheStats.cached_translations} translations cached</p>
         )}
+      </div>
+    </div>
+  );
+}
+
+const DEPLOYMENT_PHASES = [
+  {
+    phase: 'Phase 1',
+    title: 'Subdivision Validation',
+    duration: 'Week 1–4',
+    scope: '1 subdivision · 360 meters · 15 feeders',
+    color: '#FAFAFA',
+    tasks: [
+      'Deploy on BESCOM intranet (Docker + PostgreSQL)',
+      'Validate P1 alerts against field inspection outcomes',
+      'Calibrate signal thresholds using inspector feedback loop',
+      'Measure false positive rate — target: <15%',
+      'Gruha Jyothi suppressor validation with AEE team',
+    ],
+    outcome: 'Validated detection accuracy on real outcomes',
+    cost: '₹0 (existing infra)',
+  },
+  {
+    phase: 'Phase 2',
+    title: 'Division Rollout',
+    duration: 'Week 5–10',
+    scope: '1 division · ~5,000 meters · ~200 feeders',
+    color: '#3B82F6',
+    tasks: [
+      'Scale data pipeline to ingest 5K meters at 15-min intervals',
+      'Integrate BESCOM MDMS API for live AMI data',
+      'Deploy bilingual SMS alerts to field inspectors (Fast2SMS)',
+      'Train AEE/JE staff on action sheet triage workflow',
+      'DT energy balance cross-check at division level',
+    ],
+    outcome: 'Field-tested with BESCOM staff using real workflows',
+    cost: '₹15,000/mo (cloud + SMS)',
+  },
+  {
+    phase: 'Phase 3',
+    title: 'Bangalore Urban Circle',
+    duration: 'Week 11–18',
+    scope: '~28,000 meters · ~1,200 feeders · 8 divisions',
+    color: '#F59E0B',
+    tasks: [
+      'Horizontal scaling: Kubernetes cluster for parallel feeder processing',
+      'LightGBM retraining pipeline (weekly automated retrain)',
+      'Evidence card generation for Section 135/138 prosecution cases',
+      'Integration with BESCOM\'s existing billing + CRM systems',
+      'Holiday-aware demand forecasting (Calendarific + Deepavali/Ugadi)',
+    ],
+    outcome: 'Production system covering full Bangalore Urban',
+    cost: '₹45,000/mo (cloud + SMS + ops)',
+  },
+  {
+    phase: 'Phase 4',
+    title: 'Full BESCOM + Multi-DISCOM',
+    duration: 'Month 5–8',
+    scope: '3,20,000+ meters · All 4 circles · Template for HESCOM/GESCOM/CESC/MESCOM',
+    color: '#22C55E',
+    tasks: [
+      'Deploy across Rural, Mysuru, and Davanagere circles',
+      'Multi-tenant architecture: each DISCOM as isolated tenant',
+      'Federated model: retrain per-DISCOM while sharing signal weights',
+      'API gateway for third-party audit firms (legal compliance)',
+      'Dashboard white-labeling per DISCOM branding',
+    ],
+    outcome: 'Karnataka-wide smart meter intelligence platform',
+    cost: '₹1.2L/mo at scale (ROI: estimated ₹43Cr/yr recovery)',
+  },
+];
+
+const ARCHITECTURE_CHOICES = [
+  { label: 'No LLM on meter data', desc: 'All detection is statistical + rule-based. Compliant with Theme 8 constraint. Explainable by design.', status: 'compliant' },
+  { label: 'Read-only decision layer', desc: 'Zero writes to BESCOM MDMS/billing. Operates as parallel intelligence overlay.', status: 'compliant' },
+  { label: 'Masked consumer identity', desc: 'All meter IDs are SHA-256 hashed. No PII in the system. Reversible only by BESCOM DBA.', status: 'compliant' },
+  { label: 'Auditable outputs', desc: 'Every alert has SHA-256 hash chain, signal breakdown, and Section 65B metadata.', status: 'compliant' },
+  { label: 'False positive visibility', desc: 'FP rate tracked per signal. Gruha Jyothi suppressor prevents 103/360 wrongful flags.', status: 'compliant' },
+  { label: 'Offline-capable', desc: 'Once data is loaded, all analytics run without internet. SMS is the only external dependency.', status: 'compliant' },
+];
+
+function DeploymentTab() {
+  return (
+    <div className="space-y-10">
+      <div>
+        <h3 className="text-xs text-[#808080] uppercase tracking-widest font-mono mb-2">BESCOM Deployment Roadmap</h3>
+        <p className="text-xs text-[#808080] mb-6">Phased rollout from pilot validation to Karnataka-wide deployment</p>
+
+        <div className="space-y-6">
+          {DEPLOYMENT_PHASES.map((p, i) => (
+            <div
+              key={i}
+              className="border border-[#333333] bg-[#111111] p-5 opacity-0 animate-fadeIn"
+              style={{ animationDelay: `${i * 80}ms`, animationFillMode: 'forwards' }}
+            >
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <span className="text-xs font-mono font-semibold" style={{ color: p.color }}>{p.phase}</span>
+                  <h4 className="text-sm text-white mt-1">{p.title}</h4>
+                  <p className="text-xs text-[#808080] mt-0.5">{p.duration} · {p.scope}</p>
+                </div>
+                <span className="text-xs font-mono text-[#999999] border border-[#333333] px-2 py-1">{p.cost}</span>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-1.5">
+                {p.tasks.map((task, j) => (
+                  <div key={j} className="flex items-start gap-2 text-xs text-[#999999]">
+                    <span className="mt-0.5 w-1 h-1 rounded-full flex-shrink-0" style={{ backgroundColor: p.color }} />
+                    {task}
+                  </div>
+                ))}
+              </div>
+              <div className="mt-3 pt-3 border-t border-[#333333] flex items-center justify-between">
+                <span className="text-xs text-[#808080]">Outcome:</span>
+                <span className="text-xs font-mono text-[#FAFAFA]">{p.outcome}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <h3 className="text-xs text-[#808080] uppercase tracking-widest font-mono mb-4">Constraint Compliance</h3>
+        <div className="space-y-2">
+          {ARCHITECTURE_CHOICES.map((c, i) => (
+            <div key={i} className="flex items-start gap-3 p-3 border border-[#333333] bg-[#111111]">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#22C55E] mt-1.5 flex-shrink-0" />
+              <div>
+                <p className="text-xs text-[#FAFAFA] font-mono">{c.label}</p>
+                <p className="text-xs text-[#808080] mt-0.5">{c.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

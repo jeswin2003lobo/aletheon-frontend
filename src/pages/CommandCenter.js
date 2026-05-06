@@ -202,6 +202,32 @@ export default function CommandCenter() {
         )}
       </section>
 
+      {/* Scale Projections */}
+      {pipeline && (
+        <section className="border border-[#333333] bg-[#111111] p-6">
+          <h2 className="text-xs text-[#808080] uppercase tracking-widest font-mono mb-5">Scale Projection</h2>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            {[
+              { label: 'Pilot (Current)', meters: '360', feeders: '15', localities: '12', revenue: formatINR(pipeline.revenue_at_risk_monthly_inr * 12), accent: '#FAFAFA' },
+              { label: 'Bangalore Urban', meters: '28,000', feeders: '~1,200', localities: '~180', revenue: formatINR(pipeline.revenue_at_risk_monthly_inr * 12 * (28000 / 360)), accent: '#3B82F6' },
+              { label: 'Full BESCOM', meters: '3,20,000', feeders: '~12,000', localities: '~2,400', revenue: formatINR(pipeline.revenue_at_risk_monthly_inr * 12 * (320000 / 360)), accent: '#F59E0B' },
+              { label: 'Karnataka (5 DISCOMs)', meters: '12,00,000', feeders: '~48,000', localities: '~9,600', revenue: formatINR(pipeline.revenue_at_risk_monthly_inr * 12 * (1200000 / 360)), accent: '#22C55E' },
+            ].map((tier, i) => (
+              <div key={i} className="opacity-0 animate-fadeIn" style={{ animationDelay: `${i * 80}ms`, animationFillMode: 'forwards' }}>
+                <p className="text-xs font-mono uppercase tracking-wide mb-3" style={{ color: tier.accent }}>{tier.label}</p>
+                <div className="space-y-1.5 text-xs">
+                  <div className="flex justify-between"><span className="text-[#808080]">Meters</span><span className="font-mono text-[#FAFAFA]">{tier.meters}</span></div>
+                  <div className="flex justify-between"><span className="text-[#808080]">Feeders</span><span className="font-mono text-[#FAFAFA]">{tier.feeders}</span></div>
+                  <div className="flex justify-between"><span className="text-[#808080]">Localities</span><span className="font-mono text-[#FAFAFA]">{tier.localities}</span></div>
+                  <div className="flex justify-between border-t border-[#333333] pt-1.5 mt-1.5"><span className="text-[#808080]">Annual Recovery</span><span className="font-mono" style={{ color: tier.accent }}>{tier.revenue}</span></div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="text-xs text-[#808080] mt-4 font-mono">Extrapolated from pilot: {pipeline.anomaly_detection?.p1_cases} P1 cases across {pipeline.anomaly_detection?.total_meters} meters at {formatINR(pipeline.revenue_at_risk_monthly_inr)}/mo</p>
+        </section>
+      )}
+
       {/* Health Status Footer */}
       <section className="border-t border-[#333333] pt-4" data-testid="health-status">
         {health ? (
