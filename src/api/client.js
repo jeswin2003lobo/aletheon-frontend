@@ -53,6 +53,7 @@ export const getFeederForecast = (feederId, testOnly = false) => api.get(`/api/f
 export const getForecastTimeseries = (params = {}) => api.get('/api/forecast/timeseries', { params }).then(r => r.data);
 export const getBaselines = () => api.get('/api/forecast/baselines').then(r => r.data);
 export const getFeatureImportance = () => api.get('/api/forecast/feature-importance').then(r => r.data);
+export const getDemandAlerts = () => api.get('/api/forecast/demand-alerts').then(r => r.data);
 
 // ==================== KPI ====================
 export const getKPIDashboard = () => api.get('/api/kpi/dashboard').then(r => r.data);

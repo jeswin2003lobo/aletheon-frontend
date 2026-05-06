@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../context/TranslationContext';
 import { useApiData } from '../hooks/useApiData';
 import { useCountUp } from '../hooks/useCountUp';
-import { getPipelineSummary, getAnomalyOverview, getGridOverview, getDataHealth, getDemoCases } from '../api/client';
+import { getPipelineSummary, getAnomalyOverview, getGridOverview, getDataHealth, getDemoCases, getDemandAlerts } from '../api/client';
 import { KPISkeleton, TableSkeleton } from '../components/LoadingState';
 import { ErrorState } from '../components/ErrorState';
 import { EmptyState } from '../components/EmptyState';
-import { formatINR, truncateHash, getBandColor, cleanTierName } from '../utils/formatters';
+import { formatINR, truncateHash, getBandColor, cleanTierName, displayValue } from '../utils/formatters';
 
 function KPICard({ label, value, accent = '#FAFAFA', delay = 0 }) {
   const animatedValue = useCountUp(typeof value === 'number' ? value : null, 800);
@@ -34,6 +34,7 @@ export default function CommandCenter() {
   const { data: grid, loading: gridLoading, error: gridError, retry: gridRetry } = useApiData(getGridOverview);
   const { data: health } = useApiData(getDataHealth);
   const { data: demoCases, loading: demoLoading, error: demoError, retry: demoRetry } = useApiData(getDemoCases);
+  const { data: demandAlerts, loading: alertsLoading } = useApiData(getDemandAlerts);
   const [expandedStory, setExpandedStory] = useState(null);
 
   // Derive KPI values from pipeline
@@ -159,6 +160,55 @@ export default function CommandCenter() {
             </div>
           )}
         </div>
+      </section>
+
+      {/* Demand Alerts */}
+      <section>
+        <h2 className="text-xs text-[#808080] uppercase tracking-widest font-mono mb-5">{t('Demand Alerts')}</h2>
+        {alertsLoading ? (
+          <div className="space-y-2">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="animate-pulse bg-[#111111] border border-[#333333] h-16" />
+            ))}
+          </div>
+        ) : !demandAlerts || demandAlerts.length === 0 ? (
+          <EmptyState message="No demand alerts" />
+        ) : (
+          <div className="space-y-2">
+            {demandAlerts.slice(0, 10).map((alert, i) => {
+              const severityColor = alert.severity === 'CRITICAL' ? '#EF4444' : alert.severity === 'WARNING' ? '#F59E0B' : '#3B82F6';
+              return (
+                <div
+                  key={alert.feeder_id_hash || i}
+                  className="bg-[#111111] border border-[#333333] px-5 py-3.5 flex items-center gap-4 opacity-0 animate-fadeIn hover:bg-[#1A1A1A] cursor-pointer transition-colors"
+                  style={{ animationDelay: `${i * 40}ms`, animationFillMode: 'forwards' }}
+                  onClick={() => navigate(`/grid?feeder=${alert.feeder_id_hash}`)}
+                >
+                  <span
+                    className="text-xs font-mono px-2 py-0.5 rounded-sm flex-shrink-0"
+                    style={{ backgroundColor: severityColor + '20', color: severityColor }}
+                  >
+                    {alert.severity}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-[#FAFAFA]">{alert.locality || truncateHash(alert.feeder_id_hash)}</span>
+                      <span className="text-xs text-[#808080]">{alert.zone}</span>
+                    </div>
+                    <p className="text-xs text-[#808080] mt-0.5">
+                      Peak {alert.peak_time?.substring(11, 16) || '—'} · {displayValue(alert.peak_forecast_kwh)} kWh / {displayValue(alert.capacity_kw)} kW capacity
+                      {alert.context && <span className="text-[#999999]"> · {alert.context}</span>}
+                    </p>
+                  </div>
+                  <div className="text-right flex-shrink-0">
+                    <span className="text-lg font-mono" style={{ color: severityColor }}>{alert.peak_load_pct?.toFixed(1)}%</span>
+                    <p className="text-xs text-[#808080]">{alert.red_hours}h RED · {alert.amber_hours}h AMBER</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </section>
 
       {/* Case Highlights */}

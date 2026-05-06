@@ -1,9 +1,9 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { useApiData } from '../hooks/useApiData';
 import {
   getEvaluation, getFPAudit, getFPRateBySignal, getThresholds,
   getFeedbackStats, getFeedbackList, submitFeedback,
-  sendSMS, sendAlert, getHolidays, translateToKannada, getTranslationCacheStats
+  sendSMS, sendAlert
 } from '../api/client';
 import { TableSkeleton, ChartSkeleton } from '../components/LoadingState';
 import { ErrorState } from '../components/ErrorState';
@@ -12,7 +12,7 @@ import { displayValue, signalDisplayName, truncateHash } from '../utils/formatte
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { Check, AlertCircle } from 'lucide-react';
 
-const TABS = ['Evaluation', 'Thresholds', 'Feedback', 'Notifications', 'Holidays', 'Deployment'];
+const TABS = ['Evaluation', 'Thresholds', 'Feedback', 'Notifications', 'Deployment'];
 
 export default function Settings() {
   const [activeTab, setActiveTab] = useState('Evaluation');
@@ -37,7 +37,6 @@ export default function Settings() {
       {activeTab === 'Thresholds' && <ThresholdsTab />}
       {activeTab === 'Feedback' && <FeedbackTab />}
       {activeTab === 'Notifications' && <NotificationsTab />}
-      {activeTab === 'Holidays' && <HolidaysTab />}
       {activeTab === 'Deployment' && <DeploymentTab />}
     </div>
   );
