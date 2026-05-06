@@ -26,9 +26,9 @@ export default function Sidebar({ collapsed, onToggle }) {
       {/* Logo */}
       <div className="h-14 flex items-center px-4 border-b border-[#333333]">
         {collapsed ? (
-          <span className="text-xs font-mono tracking-[0.2em] text-[#999999] mx-auto">A</span>
+          <span className="text-xs font-mono tracking-[0.2em] text-white font-semibold mx-auto">A</span>
         ) : (
-          <span className="text-xs font-mono tracking-[0.2em] uppercase text-[#999999]">ALETHEON</span>
+          <span className="text-xs font-mono tracking-[0.2em] uppercase text-white font-semibold">ALETHEON</span>
         )}
       </div>
 

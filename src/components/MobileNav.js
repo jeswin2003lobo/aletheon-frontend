@@ -27,7 +27,7 @@ export default function MobileNav({ open, onClose }) {
       <nav className="absolute left-0 top-0 bottom-0 w-[260px] bg-[#060606] border-r border-[#333333] flex flex-col animate-slideInLeft">
         {/* Header */}
         <div className="h-14 flex items-center justify-between px-4 border-b border-[#333333]">
-          <span className="text-xs font-mono tracking-[0.2em] uppercase text-[#999999]">ALETHEON</span>
+          <span className="text-xs font-mono tracking-[0.2em] uppercase text-white font-semibold">ALETHEON</span>
           <button onClick={onClose} className="text-[#999999] hover:text-white p-1">
             <X className="w-4 h-4" />
           </button>
