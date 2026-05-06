@@ -18,14 +18,14 @@ export default function Settings() {
   const [activeTab, setActiveTab] = useState('Evaluation');
 
   return (
-    <div className="space-y-6 animate-fadeIn">
+    <div className="space-y-10 animate-fadeIn">
       {/* Tabs */}
-      <div className="flex gap-6 border-b border-[#1A1A1A]">
+      <div className="flex gap-8 border-b border-[#333333]">
         {TABS.map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`pb-2 text-sm transition-colors ${activeTab === tab ? 'text-white border-b border-white' : 'text-[#737373] hover:text-[#FAFAFA]'}`}
+            className={`pb-2 text-sm transition-colors ${activeTab === tab ? 'text-white border-b border-white' : 'text-[#999999] hover:text-[#FAFAFA]'}`}
             data-testid={`settings-tab-${tab.toLowerCase()}`}
           >
             {tab}
@@ -50,15 +50,15 @@ function EvaluationTab() {
   const bestF1 = evalData ? Math.max(...evalData.map(e => e.f1_score || 0)) : 0;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       {/* Evaluation Table */}
       <div>
-        <h3 className="text-sm text-[#737373] uppercase tracking-wide font-mono mb-3">Model Evaluation</h3>
+        <h3 className="text-xs text-[#808080] uppercase tracking-widest font-mono mb-4">Model Evaluation</h3>
         {evalLoading ? <TableSkeleton rows={6} cols={7} /> : evalError ? <ErrorState message={evalError} onRetry={evalRetry} /> : !evalData?.length ? <EmptyState message="No evaluation data" /> : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-[#525252] text-xs uppercase border-b border-[#1A1A1A]">
+                <tr className="text-[#808080] text-xs uppercase border-b border-[#333333]">
                   <th className="text-left py-2 font-normal">Slice</th>
                   <th className="text-right py-2 font-normal">Precision</th>
                   <th className="text-right py-2 font-normal">Recall</th>
@@ -70,7 +70,7 @@ function EvaluationTab() {
               </thead>
               <tbody>
                 {evalData.map((row, i) => (
-                  <tr key={i} className={`border-b border-[#1A1A1A] ${row.f1_score === bestF1 ? 'text-white' : 'text-[#737373]'}`}>
+                  <tr key={i} className={`border-b border-[#333333] ${row.f1_score === bestF1 ? 'text-white' : 'text-[#999999]'}`}>
                     <td className="py-2.5 text-xs">{displayValue(row.evaluation_slice)}</td>
                     <td className="py-2.5 text-right font-mono text-xs">{displayValue(row.precision)}</td>
                     <td className="py-2.5 text-right font-mono text-xs">{displayValue(row.recall)}</td>
@@ -88,12 +88,12 @@ function EvaluationTab() {
 
       {/* FP Audit */}
       <div>
-        <h3 className="text-sm text-[#737373] uppercase tracking-wide font-mono mb-3">False Positive Audit</h3>
+        <h3 className="text-xs text-[#808080] uppercase tracking-widest font-mono mb-4">False Positive Audit</h3>
         {fpLoading ? <TableSkeleton rows={4} cols={4} /> : fpError ? <ErrorState message={fpError} onRetry={fpRetry} /> : !fpAudit?.length ? <EmptyState message="No FP audit data" /> : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-[#525252] text-xs uppercase border-b border-[#1A1A1A]">
+                <tr className="text-[#808080] text-xs uppercase border-b border-[#333333]">
                   <th className="text-left py-2 font-normal">Bucket</th>
                   <th className="text-right py-2 font-normal">Count</th>
                   <th className="text-right py-2 font-normal">%</th>
@@ -102,7 +102,7 @@ function EvaluationTab() {
               </thead>
               <tbody>
                 {fpAudit.map((row, i) => (
-                  <tr key={i} className="border-b border-[#1A1A1A] text-[#737373]">
+                  <tr key={i} className="border-b border-[#333333] text-[#999999]">
                     <td className="py-2.5 text-xs text-[#FAFAFA]">{displayValue(row.bucket)}</td>
                     <td className="py-2.5 text-right font-mono text-xs">{displayValue(row.count)}</td>
                     <td className="py-2.5 text-right font-mono text-xs">{displayValue(row.percentage)}%</td>
@@ -117,14 +117,14 @@ function EvaluationTab() {
 
       {/* FP Rate by Signal */}
       <div>
-        <h3 className="text-sm text-[#737373] uppercase tracking-wide font-mono mb-3">FP Rate by Signal</h3>
+        <h3 className="text-xs text-[#808080] uppercase tracking-widest font-mono mb-4">FP Rate by Signal</h3>
         {frLoading ? <ChartSkeleton height="h-48" /> : frError ? <ErrorState message={frError} onRetry={frRetry} /> : !fpRate?.length ? <EmptyState message="No FP rate data" /> : (
           <div className="h-48">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={fpRate.map(r => ({ ...r, name: signalDisplayName(r.signal_name) }))} layout="vertical" margin={{ left: 100, right: 20 }}>
-                <XAxis type="number" stroke="#525252" tick={{ fontSize: 10, fill: '#737373' }} />
-                <YAxis type="category" dataKey="name" stroke="#1A1A1A" tick={{ fontSize: 10, fill: '#737373' }} width={95} />
-                <Tooltip contentStyle={{ backgroundColor: '#0A0A0A', border: '1px solid #1A1A1A', fontSize: 11 }} />
+                <XAxis type="number" stroke="#555555" tick={{ fontSize: 10, fill: '#999999' }} />
+                <YAxis type="category" dataKey="name" stroke="#333333" tick={{ fontSize: 10, fill: '#999999' }} width={95} />
+                <Tooltip contentStyle={{ backgroundColor: '#111111', border: '1px solid #333333', fontSize: 11 }} labelStyle={{ color: '#FAFAFA' }} itemStyle={{ color: '#FAFAFA' }} />
                 <Bar dataKey="false_positive_rate_pct" radius={[0, 2, 2, 0]} fill="#737373" animationDuration={600} />
               </BarChart>
             </ResponsiveContainer>
@@ -140,12 +140,12 @@ function ThresholdsTab() {
 
   return (
     <div>
-      <h3 className="text-sm text-[#737373] uppercase tracking-wide font-mono mb-3">Signal Thresholds</h3>
+      <h3 className="text-xs text-[#808080] uppercase tracking-widest font-mono mb-4">Signal Thresholds</h3>
       {loading ? <TableSkeleton rows={8} cols={6} /> : error ? <ErrorState message={error} onRetry={retry} /> : !data?.length ? <EmptyState message="No threshold data" /> : (
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-[#525252] text-xs uppercase border-b border-[#1A1A1A]">
+              <tr className="text-[#808080] text-xs uppercase border-b border-[#333333]">
                 <th className="text-left py-2 font-normal">Signal</th>
                 <th className="text-right py-2 font-normal">Old</th>
                 <th className="text-right py-2 font-normal">New</th>
@@ -156,7 +156,7 @@ function ThresholdsTab() {
             </thead>
             <tbody>
               {data.map((row, i) => (
-                <tr key={i} className="border-b border-[#1A1A1A] text-[#737373]">
+                <tr key={i} className="border-b border-[#333333] text-[#999999]">
                   <td className="py-2.5 text-xs text-[#FAFAFA]">{signalDisplayName(row.signal_name)}</td>
                   <td className="py-2.5 text-right font-mono text-xs">{displayValue(row.old_threshold)}</td>
                   <td className="py-2.5 text-right font-mono text-xs text-[#FAFAFA]">{displayValue(row.new_threshold)}</td>
@@ -197,36 +197,36 @@ function FeedbackTab() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Stats */}
       {stats && (
         <div className="flex gap-4 text-sm font-mono">
-          <span className="text-[#737373]">Total: <span className="text-[#FAFAFA]">{stats.total_feedback}</span></span>
+          <span className="text-[#999999]">Total: <span className="text-[#FAFAFA]">{stats.total_feedback}</span></span>
           {stats.by_type && Object.entries(stats.by_type).map(([k, v]) => (
-            <span key={k} className="text-[#525252]">{k}: {v}</span>
+            <span key={k} className="text-[#808080]">{k}: {v}</span>
           ))}
         </div>
       )}
 
       {/* Submit Form */}
-      <form onSubmit={handleSubmit} className="border border-[#1A1A1A] p-4 space-y-3">
-        <h4 className="text-sm text-[#737373] uppercase tracking-wide font-mono">Submit Feedback</h4>
+      <form onSubmit={handleSubmit} className="border border-[#333333] p-4 space-y-3">
+        <h4 className="text-sm text-[#999999] uppercase tracking-wide font-mono">Submit Feedback</h4>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <input placeholder="Case ID" value={form.case_id} onChange={e => setForm(prev => ({ ...prev, case_id: e.target.value }))} className="bg-[#000] border border-[#1A1A1A] text-sm text-[#FAFAFA] px-3 py-2 outline-none focus:border-[#525252]" required />
-          <input placeholder="Meter ID" value={form.meter_id_hash} onChange={e => setForm(prev => ({ ...prev, meter_id_hash: e.target.value }))} className="bg-[#000] border border-[#1A1A1A] text-sm text-[#FAFAFA] px-3 py-2 outline-none focus:border-[#525252]" required />
-          <input placeholder="Inspector ID" value={form.inspector_id} onChange={e => setForm(prev => ({ ...prev, inspector_id: e.target.value }))} className="bg-[#000] border border-[#1A1A1A] text-sm text-[#FAFAFA] px-3 py-2 outline-none focus:border-[#525252]" />
+          <input placeholder="Case ID" value={form.case_id} onChange={e => setForm(prev => ({ ...prev, case_id: e.target.value }))} className="bg-[#0D0D0D] border border-[#333333] text-sm text-[#FAFAFA] px-3 py-2 outline-none focus:border-[#525252]" required />
+          <input placeholder="Meter ID" value={form.meter_id_hash} onChange={e => setForm(prev => ({ ...prev, meter_id_hash: e.target.value }))} className="bg-[#0D0D0D] border border-[#333333] text-sm text-[#FAFAFA] px-3 py-2 outline-none focus:border-[#525252]" required />
+          <input placeholder="Inspector ID" value={form.inspector_id} onChange={e => setForm(prev => ({ ...prev, inspector_id: e.target.value }))} className="bg-[#0D0D0D] border border-[#333333] text-sm text-[#FAFAFA] px-3 py-2 outline-none focus:border-[#525252]" />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <select value={form.feedback_type} onChange={e => setForm(prev => ({ ...prev, feedback_type: e.target.value }))} className="bg-[#000] border border-[#1A1A1A] text-sm text-[#FAFAFA] px-3 py-2 outline-none">
+          <select value={form.feedback_type} onChange={e => setForm(prev => ({ ...prev, feedback_type: e.target.value }))} className="bg-[#0D0D0D] border border-[#333333] text-sm text-[#FAFAFA] px-3 py-2 outline-none">
             <option value="CONFIRMED_THEFT">Confirmed Theft</option>
             <option value="FALSE_POSITIVE">False Positive</option>
             <option value="NEEDS_REVIEW">Needs Review</option>
             <option value="METER_FAULT">Meter Fault</option>
             <option value="LEGITIMATE_USE">Legitimate Use</option>
           </select>
-          <input placeholder="Finding" value={form.finding} onChange={e => setForm(prev => ({ ...prev, finding: e.target.value }))} className="bg-[#000] border border-[#1A1A1A] text-sm text-[#FAFAFA] px-3 py-2 outline-none focus:border-[#525252]" required />
+          <input placeholder="Finding" value={form.finding} onChange={e => setForm(prev => ({ ...prev, finding: e.target.value }))} className="bg-[#0D0D0D] border border-[#333333] text-sm text-[#FAFAFA] px-3 py-2 outline-none focus:border-[#525252]" required />
         </div>
-        <textarea placeholder="Notes (optional)" value={form.notes} onChange={e => setForm(prev => ({ ...prev, notes: e.target.value }))} className="w-full bg-[#000] border border-[#1A1A1A] text-sm text-[#FAFAFA] px-3 py-2 outline-none focus:border-[#525252] h-20 resize-none" />
+        <textarea placeholder="Notes (optional)" value={form.notes} onChange={e => setForm(prev => ({ ...prev, notes: e.target.value }))} className="w-full bg-[#0D0D0D] border border-[#333333] text-sm text-[#FAFAFA] px-3 py-2 outline-none focus:border-[#525252] h-20 resize-none" />
         <div className="flex items-center gap-3">
           <button type="submit" disabled={submitting} className="text-xs px-4 py-2 bg-white text-black hover:bg-[#E0E0E0] disabled:opacity-50 transition-colors">
             {submitting ? 'Submitting...' : 'Submit Feedback'}
@@ -242,12 +242,12 @@ function FeedbackTab() {
 
       {/* Recent Feedback */}
       <div>
-        <h4 className="text-sm text-[#737373] uppercase tracking-wide font-mono mb-3">Recent Feedback</h4>
+        <h4 className="text-xs text-[#808080] uppercase tracking-widest font-mono mb-4">Recent Feedback</h4>
         {lLoading ? <TableSkeleton rows={5} cols={5} /> : lError ? <ErrorState message={lError} onRetry={lRetry} /> : !list?.length ? <EmptyState message="No feedback yet" /> : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-[#525252] text-xs uppercase border-b border-[#1A1A1A]">
+                <tr className="text-[#808080] text-xs uppercase border-b border-[#333333]">
                   <th className="text-left py-2 font-normal">Case</th>
                   <th className="text-left py-2 font-normal">Type</th>
                   <th className="text-left py-2 font-normal">Finding</th>
@@ -257,7 +257,7 @@ function FeedbackTab() {
               </thead>
               <tbody>
                 {(Array.isArray(list) ? list : []).slice(0, 20).map((row, i) => (
-                  <tr key={i} className="border-b border-[#1A1A1A] text-[#737373]">
+                  <tr key={i} className="border-b border-[#333333] text-[#999999]">
                     <td className="py-2 text-xs font-mono text-[#FAFAFA]">{truncateHash(row.case_id, 10)}</td>
                     <td className="py-2 text-xs">{displayValue(row.feedback_type)}</td>
                     <td className="py-2 text-xs">{displayValue(row.finding)}</td>
@@ -311,12 +311,12 @@ function NotificationsTab() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       {/* SMS Form */}
-      <form onSubmit={handleSMS} className="border border-[#1A1A1A] p-4 space-y-3">
-        <h4 className="text-sm text-[#737373] uppercase tracking-wide font-mono">Send SMS</h4>
-        <textarea placeholder="Message" value={smsForm.message} onChange={e => setSmsForm(prev => ({ ...prev, message: e.target.value }))} className="w-full bg-[#000] border border-[#1A1A1A] text-sm text-[#FAFAFA] px-3 py-2 outline-none focus:border-[#525252] h-20 resize-none" required />
-        <input placeholder="Phone numbers (optional, comma-separated)" value={smsForm.phone_numbers} onChange={e => setSmsForm(prev => ({ ...prev, phone_numbers: e.target.value }))} className="w-full bg-[#000] border border-[#1A1A1A] text-sm text-[#FAFAFA] px-3 py-2 outline-none focus:border-[#525252]" />
+      <form onSubmit={handleSMS} className="border border-[#333333] p-4 space-y-3">
+        <h4 className="text-sm text-[#999999] uppercase tracking-wide font-mono">Send SMS</h4>
+        <textarea placeholder="Message" value={smsForm.message} onChange={e => setSmsForm(prev => ({ ...prev, message: e.target.value }))} className="w-full bg-[#0D0D0D] border border-[#333333] text-sm text-[#FAFAFA] px-3 py-2 outline-none focus:border-[#525252] h-20 resize-none" required />
+        <input placeholder="Phone numbers (optional, comma-separated)" value={smsForm.phone_numbers} onChange={e => setSmsForm(prev => ({ ...prev, phone_numbers: e.target.value }))} className="w-full bg-[#0D0D0D] border border-[#333333] text-sm text-[#FAFAFA] px-3 py-2 outline-none focus:border-[#525252]" />
         <div className="flex items-center gap-3">
           <button type="submit" disabled={smsSending} className="text-xs px-4 py-2 bg-white text-black hover:bg-[#E0E0E0] disabled:opacity-50 transition-colors">{smsSending ? 'Sending...' : 'Send SMS'}</button>
           {smsResult && (
@@ -326,17 +326,17 @@ function NotificationsTab() {
       </form>
 
       {/* Alert Form */}
-      <form onSubmit={handleAlert} className="border border-[#1A1A1A] p-4 space-y-3">
-        <h4 className="text-sm text-[#737373] uppercase tracking-wide font-mono">Send Alert</h4>
+      <form onSubmit={handleAlert} className="border border-[#333333] p-4 space-y-3">
+        <h4 className="text-sm text-[#999999] uppercase tracking-wide font-mono">Send Alert</h4>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <input placeholder="Case ID" value={alertForm.case_id} onChange={e => setAlertForm(prev => ({ ...prev, case_id: e.target.value }))} className="bg-[#000] border border-[#1A1A1A] text-sm text-[#FAFAFA] px-3 py-2 outline-none focus:border-[#525252]" required />
-          <input placeholder="Meter ID" value={alertForm.meter_id} onChange={e => setAlertForm(prev => ({ ...prev, meter_id: e.target.value }))} className="bg-[#000] border border-[#1A1A1A] text-sm text-[#FAFAFA] px-3 py-2 outline-none focus:border-[#525252]" required />
-          <select value={alertForm.priority} onChange={e => setAlertForm(prev => ({ ...prev, priority: e.target.value }))} className="bg-[#000] border border-[#1A1A1A] text-sm text-[#FAFAFA] px-3 py-2 outline-none">
+          <input placeholder="Case ID" value={alertForm.case_id} onChange={e => setAlertForm(prev => ({ ...prev, case_id: e.target.value }))} className="bg-[#0D0D0D] border border-[#333333] text-sm text-[#FAFAFA] px-3 py-2 outline-none focus:border-[#525252]" required />
+          <input placeholder="Meter ID" value={alertForm.meter_id} onChange={e => setAlertForm(prev => ({ ...prev, meter_id: e.target.value }))} className="bg-[#0D0D0D] border border-[#333333] text-sm text-[#FAFAFA] px-3 py-2 outline-none focus:border-[#525252]" required />
+          <select value={alertForm.priority} onChange={e => setAlertForm(prev => ({ ...prev, priority: e.target.value }))} className="bg-[#0D0D0D] border border-[#333333] text-sm text-[#FAFAFA] px-3 py-2 outline-none">
             <option value="P1">P1</option>
             <option value="P2">P2</option>
             <option value="P3">P3</option>
           </select>
-          <input placeholder="Reason" value={alertForm.reason} onChange={e => setAlertForm(prev => ({ ...prev, reason: e.target.value }))} className="bg-[#000] border border-[#1A1A1A] text-sm text-[#FAFAFA] px-3 py-2 outline-none focus:border-[#525252]" required />
+          <input placeholder="Reason" value={alertForm.reason} onChange={e => setAlertForm(prev => ({ ...prev, reason: e.target.value }))} className="bg-[#0D0D0D] border border-[#333333] text-sm text-[#FAFAFA] px-3 py-2 outline-none focus:border-[#525252]" required />
         </div>
         <div className="flex items-center gap-3">
           <button type="submit" disabled={alertSending} className="text-xs px-4 py-2 bg-white text-black hover:bg-[#E0E0E0] disabled:opacity-50 transition-colors">{alertSending ? 'Sending...' : 'Send Alert'}</button>
@@ -371,16 +371,16 @@ function HolidaysTab() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       {/* Holidays */}
       <div>
-        <h3 className="text-sm text-[#737373] uppercase tracking-wide font-mono mb-1">Karnataka Holidays</h3>
-        {holidays && <p className="text-xs text-[#525252] mb-3 font-mono">{holidays.count} holidays · Calendarific API · Karnataka (in-ka)</p>}
+        <h3 className="text-sm text-[#999999] uppercase tracking-wide font-mono mb-1">Karnataka Holidays</h3>
+        {holidays && <p className="text-xs text-[#808080] mb-3 font-mono">{holidays.count} holidays · Calendarific API · Karnataka (in-ka)</p>}
         {hLoading ? <TableSkeleton rows={8} cols={3} /> : hError ? <ErrorState message={hError} onRetry={hRetry} /> : !holidays?.holidays?.length ? <EmptyState message="No holidays data (API key may not be configured)" /> : (
           <div className="overflow-x-auto max-h-64 overflow-y-auto">
             <table className="w-full text-sm">
-              <thead className="sticky top-0 bg-[#000]">
-                <tr className="text-[#525252] text-xs uppercase border-b border-[#1A1A1A]">
+              <thead className="sticky top-0 bg-[#0D0D0D]">
+                <tr className="text-[#808080] text-xs uppercase border-b border-[#333333]">
                   <th className="text-left py-2 font-normal">Date</th>
                   <th className="text-left py-2 font-normal">Name</th>
                   <th className="text-left py-2 font-normal">Type</th>
@@ -388,7 +388,7 @@ function HolidaysTab() {
               </thead>
               <tbody>
                 {holidays.holidays.map((h, i) => (
-                  <tr key={i} className="border-b border-[#1A1A1A] text-[#737373]">
+                  <tr key={i} className="border-b border-[#333333] text-[#999999]">
                     <td className="py-2 text-xs font-mono">{h.date}</td>
                     <td className="py-2 text-xs text-[#FAFAFA]">{h.name}</td>
                     <td className="py-2 text-xs">{h.type}</td>
@@ -401,14 +401,14 @@ function HolidaysTab() {
       </div>
 
       {/* Translation Tester */}
-      <div className="border border-[#1A1A1A] p-4 space-y-3">
-        <h4 className="text-sm text-[#737373] uppercase tracking-wide font-mono">Translation Tester</h4>
+      <div className="border border-[#333333] p-4 space-y-3">
+        <h4 className="text-sm text-[#999999] uppercase tracking-wide font-mono">Translation Tester</h4>
         <form onSubmit={handleTranslate} className="flex gap-2">
           <input
             placeholder="Enter English text..."
             value={transInput}
             onChange={e => setTransInput(e.target.value)}
-            className="flex-1 bg-[#000] border border-[#1A1A1A] text-sm text-[#FAFAFA] px-3 py-2 outline-none focus:border-[#525252]"
+            className="flex-1 bg-[#0D0D0D] border border-[#333333] text-sm text-[#FAFAFA] px-3 py-2 outline-none focus:border-[#525252]"
           />
           <button type="submit" disabled={transLoading} className="text-xs px-4 py-2 bg-white text-black hover:bg-[#E0E0E0] disabled:opacity-50 transition-colors">
             {transLoading ? '...' : 'Translate'}
@@ -420,14 +420,14 @@ function HolidaysTab() {
               <p className="text-[#F59E0B]">{transResult.error}</p>
             ) : (
               <div className="space-y-1">
-                <p className="text-[#737373]">English: <span className="text-[#FAFAFA]">{transResult.english}</span></p>
-                <p className="text-[#737373]">Kannada: <span className="text-[#FAFAFA]">{transResult.kannada}</span></p>
+                <p className="text-[#999999]">English: <span className="text-[#FAFAFA]">{transResult.english}</span></p>
+                <p className="text-[#999999]">Kannada: <span className="text-[#FAFAFA]">{transResult.kannada}</span></p>
               </div>
             )}
           </div>
         )}
         {cacheStats && (
-          <p className="text-xs text-[#525252] font-mono">{cacheStats.cached_translations} translations cached</p>
+          <p className="text-xs text-[#808080] font-mono">{cacheStats.cached_translations} translations cached</p>
         )}
       </div>
     </div>

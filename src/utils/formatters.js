@@ -31,6 +31,7 @@ export const formatNumber = (n) => {
  */
 export const displayValue = (v) => {
   if (v === null || v === undefined || (typeof v === 'number' && isNaN(v))) return '—';
+  if (typeof v === 'number') return Number.isInteger(v) ? String(v) : v.toFixed(4);
   return String(v);
 };
 
@@ -80,7 +81,7 @@ export const getPriorityColor = (priority) => {
     case 'P1': return '#EF4444';
     case 'P2': return '#F59E0B';
     case 'P3': return '#3B82F6';
-    default: return '#525252';
+    default: return '#A0A0A0';
   }
 };
 
@@ -92,6 +93,6 @@ export const getBandColor = (band) => {
     case 'RED': return '#EF4444';
     case 'AMBER': return '#F59E0B';
     case 'GREEN': return '#22C55E';
-    default: return '#525252';
+    default: return '#A0A0A0';
   }
 };

@@ -9,7 +9,7 @@ export default function Layout() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div className="flex h-screen bg-[#000000] overflow-hidden">
+    <div className="flex h-screen bg-[#0A0A0A] overflow-hidden">
       {/* Desktop/Laptop sidebar */}
       <Sidebar collapsed={collapsed} onToggle={() => setCollapsed(!collapsed)} />
 
@@ -18,7 +18,7 @@ export default function Layout() {
 
       <div className="flex-1 flex flex-col min-w-0">
         <Header onMenuOpen={() => setMobileOpen(true)} />
-        <main className="flex-1 overflow-y-auto scroll-smooth p-4 md:p-6 lg:p-8">
+        <main className="flex-1 overflow-y-auto scroll-smooth p-5 md:p-8 lg:p-10">
           <Outlet />
         </main>
       </div>

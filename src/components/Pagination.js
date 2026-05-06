@@ -9,9 +9,9 @@ export default function Pagination({ page, pageSize, totalRecords, onPageChange 
   const end = Math.min(page * pageSize, totalRecords);
 
   return (
-    <div className="flex items-center justify-between py-3 text-xs text-[#737373]">
+    <div className="flex items-center justify-between py-3 text-xs text-[#999999]">
       <span>
-        Showing {start}\u2013{end} of {totalRecords}
+        Showing {start}{'–'}{end} of {totalRecords}
       </span>
       <div className="flex items-center gap-2">
         <button

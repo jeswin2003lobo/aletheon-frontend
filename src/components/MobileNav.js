@@ -24,11 +24,11 @@ export default function MobileNav({ open, onClose }) {
       <div className="absolute inset-0 bg-black/70" onClick={onClose} />
 
       {/* Drawer */}
-      <nav className="absolute left-0 top-0 bottom-0 w-[260px] bg-[#000000] border-r border-[#1A1A1A] flex flex-col animate-slideInLeft">
+      <nav className="absolute left-0 top-0 bottom-0 w-[260px] bg-[#060606] border-r border-[#333333] flex flex-col animate-slideInLeft">
         {/* Header */}
-        <div className="h-14 flex items-center justify-between px-4 border-b border-[#1A1A1A]">
-          <span className="text-xs font-mono tracking-[0.2em] uppercase text-[#737373]">ALETHEON</span>
-          <button onClick={onClose} className="text-[#737373] hover:text-white p-1">
+        <div className="h-14 flex items-center justify-between px-4 border-b border-[#333333]">
+          <span className="text-xs font-mono tracking-[0.2em] uppercase text-[#999999]">ALETHEON</span>
+          <button onClick={onClose} className="text-[#999999] hover:text-white p-1">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -43,13 +43,13 @@ export default function MobileNav({ open, onClose }) {
                 to={path}
                 onClick={onClose}
                 className={`group flex items-center gap-3 px-4 py-3 relative transition-colors duration-200 ${
-                  isActive ? 'text-white' : 'text-[#737373] hover:text-[#FAFAFA]'
+                  isActive ? 'text-white' : 'text-[#999999] hover:text-[#FAFAFA]'
                 }`}
               >
                 {isActive && (
                   <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[2px] h-5 bg-white" />
                 )}
-                <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-white' : 'text-[#525252]'}`} />
+                <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-white' : 'text-[#808080]'}`} />
                 <span className="text-sm">{t(label)}</span>
               </NavLink>
             );
@@ -57,8 +57,8 @@ export default function MobileNav({ open, onClose }) {
         </div>
 
         {/* Footer */}
-        <div className="px-4 py-3 border-t border-[#1A1A1A]">
-          <span className="text-xs text-[#525252]">v4.0 · BESCOM Theme 8</span>
+        <div className="px-4 py-3 border-t border-[#333333]">
+          <span className="text-xs text-[#808080]">v4.0 · BESCOM Theme 8</span>
         </div>
       </nav>
     </div>

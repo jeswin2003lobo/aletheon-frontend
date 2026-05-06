@@ -1,7 +1,7 @@
 import React from 'react';
 
 export function Skeleton({ className = '', variant = 'rect' }) {
-  const baseClass = 'animate-pulse bg-[#1A1A1A] rounded-sm';
+  const baseClass = 'animate-pulse bg-[#222222] rounded-sm';
   
   if (variant === 'text') {
     return <div className={`${baseClass} h-4 ${className}`} />;
@@ -14,7 +14,7 @@ export function Skeleton({ className = '', variant = 'rect' }) {
   }
   if (variant === 'card') {
     return (
-      <div className={`${baseClass} p-6 border border-[#1A1A1A] ${className}`}>
+      <div className={`${baseClass} p-6 border border-[#333333] ${className}`}>
         <div className="space-y-3">
           <div className="h-3 bg-[#252525] rounded w-1/3" />
           <div className="h-8 bg-[#252525] rounded w-1/2" />
@@ -47,13 +47,13 @@ export function KPISkeleton({ count = 6 }) {
 export function TableSkeleton({ rows = 8, cols = 5 }) {
   return (
     <div className="space-y-1">
-      <div className="flex gap-4 py-3 border-b border-[#1A1A1A]">
+      <div className="flex gap-4 py-3 border-b border-[#333333]">
         {Array.from({ length: cols }).map((_, i) => (
           <Skeleton key={i} variant="text" className="flex-1" />
         ))}
       </div>
       {Array.from({ length: rows }).map((_, i) => (
-        <div key={i} className="flex gap-4 py-3 border-b border-[#1A1A1A]" style={{ animationDelay: `${i * 50}ms` }}>
+        <div key={i} className="flex gap-4 py-3 border-b border-[#333333]" style={{ animationDelay: `${i * 50}ms` }}>
           {Array.from({ length: cols }).map((_, j) => (
             <Skeleton key={j} variant="text" className="flex-1" />
           ))}
@@ -65,11 +65,11 @@ export function TableSkeleton({ rows = 8, cols = 5 }) {
 
 export function ChartSkeleton({ height = 'h-64' }) {
   return (
-    <div className={`animate-pulse bg-[#0A0A0A] border border-[#1A1A1A] rounded-sm ${height} flex items-end justify-center gap-2 p-6`}>
+    <div className={`animate-pulse bg-[#111111] border border-[#333333] rounded-sm ${height} flex items-end justify-center gap-2 p-6`}>
       {Array.from({ length: 12 }).map((_, i) => (
         <div
           key={i}
-          className="bg-[#1A1A1A] rounded-sm flex-1"
+          className="bg-[#222222] rounded-sm flex-1"
           style={{ height: `${20 + Math.random() * 60}%`, animationDelay: `${i * 50}ms` }}
         />
       ))}

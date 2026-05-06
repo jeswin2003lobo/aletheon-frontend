@@ -23,12 +23,12 @@ export default function Header({ onMenuOpen }) {
   const isHealthy = health && (!health.errors || health.errors.length === 0);
 
   return (
-    <header className="h-14 flex items-center justify-between px-4 md:px-6 border-b border-[#1A1A1A] bg-[#000000] flex-shrink-0">
+    <header className="h-14 flex items-center justify-between px-4 md:px-6 border-b border-[#333333] bg-[#060606] flex-shrink-0">
       <div className="flex items-center gap-3">
         {/* Mobile hamburger */}
         <button
           onClick={onMenuOpen}
-          className="lg:hidden text-[#737373] hover:text-white p-1"
+          className="lg:hidden text-[#999999] hover:text-white p-1"
           data-testid="mobile-menu-button"
         >
           <Menu className="w-5 h-5" />
@@ -49,13 +49,13 @@ export default function Header({ onMenuOpen }) {
         <button
           onClick={toggleLanguage}
           disabled={translating}
-          className="text-xs text-[#737373] hover:text-[#FAFAFA] transition-colors duration-200 font-mono"
+          className="text-sm px-3 py-1.5 border border-[#444444] hover:border-white text-[#FAFAFA] hover:text-white transition-all duration-200 font-mono rounded-sm"
           data-testid="lang-toggle"
         >
           {lang === 'en' ? (
-            <span>EN | <span className="opacity-50">ಕನ್ನಡ</span></span>
+            <span><span className="text-white font-medium">EN</span> <span className="text-[#666666] mx-0.5">|</span> <span className="text-[#808080]">ಕನ್ನಡ</span></span>
           ) : (
-            <span><span className="opacity-50">EN</span> | ಕನ್ನಡ</span>
+            <span><span className="text-[#808080]">EN</span> <span className="text-[#666666] mx-0.5">|</span> <span className="text-white font-medium">ಕನ್ನಡ</span></span>
           )}
         </button>
       </div>

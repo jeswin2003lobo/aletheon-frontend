@@ -14,11 +14,11 @@ html, body, #root {
   height: 100%;
   margin: 0;
   padding: 0;
-  background-color: #000000;
+  background-color: #0A0A0A;
   color: #FAFAFA;
   font-family: var(--font-sans);
-  font-size: 14px;
-  line-height: 1.5;
+  font-size: 15px;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -30,21 +30,21 @@ html, body, #root {
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #000000;
+  background: #111111;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1A1A1A;
-  border-radius: 3px;
+  background: #3A3A3A;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #525252;
+  background: #555555;
 }
 
 /* Animations */
@@ -132,15 +132,15 @@ html, body, #root {
 }
 
 .leaflet-popup-content-wrapper {
-  background: #0A0A0A !important;
+  background: #111111 !important;
   color: #FAFAFA !important;
-  border: 1px solid #1A1A1A !important;
+  border: 1px solid #333333 !important;
   border-radius: 0 !important;
   box-shadow: none !important;
 }
 
 .leaflet-popup-tip {
-  background: #0A0A0A !important;
+  background: #111111 !important;
 }
 
 .leaflet-popup-close-button {
@@ -194,7 +194,7 @@ th {
 /* Select styling */
 select {
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23737373' d='M3 5l3 3 3-3'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23FAFAFA' d='M3 5l3 3 3-3'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 8px center;
   padding-right: 24px;

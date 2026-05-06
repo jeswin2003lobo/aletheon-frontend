@@ -18,17 +18,17 @@ export default function Sidebar({ collapsed, onToggle }) {
 
   return (
     <aside
-      className={`hidden lg:flex flex-col border-r border-[#1A1A1A] bg-[#000000] transition-all duration-300 ${
+      className={`hidden lg:flex flex-col border-r border-[#333333] bg-[#060606] transition-all duration-300 ${
         collapsed ? 'w-[60px]' : 'w-[240px]'
       }`}
       data-testid="sidebar"
     >
       {/* Logo */}
-      <div className="h-14 flex items-center px-4 border-b border-[#1A1A1A]">
+      <div className="h-14 flex items-center px-4 border-b border-[#333333]">
         {collapsed ? (
-          <span className="text-xs font-mono tracking-[0.2em] text-[#737373] mx-auto">A</span>
+          <span className="text-xs font-mono tracking-[0.2em] text-[#999999] mx-auto">A</span>
         ) : (
-          <span className="text-xs font-mono tracking-[0.2em] uppercase text-[#737373]">ALETHEON</span>
+          <span className="text-xs font-mono tracking-[0.2em] uppercase text-[#999999]">ALETHEON</span>
         )}
       </div>
 
@@ -43,7 +43,7 @@ export default function Sidebar({ collapsed, onToggle }) {
               className={`group flex items-center gap-3 px-4 py-2.5 relative transition-colors duration-200 ${
                 isActive
                   ? 'text-white'
-                  : 'text-[#737373] hover:text-[#FAFAFA]'
+                  : 'text-[#999999] hover:text-[#FAFAFA]'
               }`}
               title={collapsed ? t(label) : undefined}
               data-testid={`nav-${path.replace('/', '') || 'home'}`}
@@ -51,7 +51,7 @@ export default function Sidebar({ collapsed, onToggle }) {
               {isActive && (
                 <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[2px] h-5 bg-white" />
               )}
-              <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-white' : 'text-[#525252] group-hover:text-[#FAFAFA]'}`} />
+              <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-white' : 'text-[#808080] group-hover:text-[#FAFAFA]'}`} />
               {!collapsed && (
                 <span className="text-sm truncate">{t(label)}</span>
               )}
@@ -61,13 +61,13 @@ export default function Sidebar({ collapsed, onToggle }) {
       </nav>
 
       {/* Footer */}
-      <div className="px-4 py-3 border-t border-[#1A1A1A] flex items-center justify-between">
+      <div className="px-4 py-3 border-t border-[#333333] flex items-center justify-between">
         {!collapsed && (
-          <span className="text-xs text-[#525252]">v4.0 · BESCOM</span>
+          <span className="text-xs text-[#808080]">v4.0 · BESCOM</span>
         )}
         <button
           onClick={onToggle}
-          className="text-[#525252] hover:text-[#FAFAFA] transition-colors p-1"
+          className="text-[#808080] hover:text-[#FAFAFA] transition-colors p-1"
           data-testid="sidebar-toggle"
         >
           {collapsed ? <PanelLeft className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
