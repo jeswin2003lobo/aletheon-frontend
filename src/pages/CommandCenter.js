@@ -1,0 +1,221 @@
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from '../context/TranslationContext';
+import { useApiData } from '../hooks/useApiData';
+import { useCountUp } from '../hooks/useCountUp';
+import { getPipelineSummary, getAnomalyOverview, getGridOverview, getDataHealth, getDemoCases } from '../api/client';
+import { KPISkeleton, TableSkeleton } from '../components/LoadingState';
+import { ErrorState } from '../components/ErrorState';
+import { EmptyState } from '../components/EmptyState';
+import { formatINR, truncateHash, getBandColor, cleanTierName } from '../utils/formatters';
+
+function KPICard({ label, value, accent = '#FAFAFA', delay = 0 }) {
+  const animatedValue = useCountUp(typeof value === 'number' ? value : null, 800);
+  const displayVal = typeof value === 'number' ? animatedValue : value;
+
+  return (
+    <div
+      className="bg-[#0A0A0A] border border-[#1A1A1A] p-6 flex flex-col justify-between min-h-[112px] opacity-0 animate-fadeIn"
+      style={{ animationDelay: `${delay}ms`, animationFillMode: 'forwards' }}
+    >
+      <span className="text-xs uppercase tracking-wide text-[#737373] font-mono">{label}</span>
+      <span className="text-3xl font-light font-mono mt-2" style={{ color: accent }}>
+        {displayVal ?? '\u2014'}
+      </span>
+    </div>
+  );
+}
+
+export default function CommandCenter() {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { data: pipeline, loading: pipeLoading, error: pipeError, retry: pipeRetry } = useApiData(getPipelineSummary);
+  const { data: anomaly, loading: anomLoading, error: anomError, retry: anomRetry } = useApiData(getAnomalyOverview);
+  const { data: grid, loading: gridLoading, error: gridError, retry: gridRetry } = useApiData(getGridOverview);
+  const { data: health } = useApiData(getDataHealth);
+  const { data: demoCases, loading: demoLoading, error: demoError, retry: demoRetry } = useApiData(getDemoCases);
+  const [expandedStory, setExpandedStory] = useState(null);
+
+  // Derive KPI values from pipeline
+  const kpis = pipeline ? [
+    { label: t('Total Meters'), value: pipeline.anomaly_detection?.total_meters, accent: '#FAFAFA' },
+    { label: 'P1 Alerts', value: pipeline.anomaly_detection?.p1_cases, accent: '#EF4444' },
+    { label: 'P2 Review', value: pipeline.anomaly_detection?.p2_cases, accent: '#F59E0B' },
+    { label: 'Stressed Feeders', value: (pipeline.grid_stress?.red_feeders || 0) + (pipeline.grid_stress?.amber_feeders || 0), accent: pipeline.grid_stress?.red_feeders > 0 ? '#EF4444' : '#F59E0B' },
+    { label: t('Revenue at Risk'), value: pipeline.revenue_at_risk_monthly_inr ? formatINR(pipeline.revenue_at_risk_monthly_inr) + '/mo' : '\u2014', accent: '#FAFAFA' },
+    { label: 'Forecast Accuracy', value: pipeline.demand_forecast?.wmape_pct != null ? (100 - pipeline.demand_forecast.wmape_pct).toFixed(2) + '%' : '\u2014', accent: '#FAFAFA' },
+  ] : [];
+
+  // Sort feeders: RED > AMBER > GREEN
+  const sortedFeeders = grid?.feeders ? [...grid.feeders].sort((a, b) => {
+    const order = { RED: 0, AMBER: 1, GREEN: 2 };
+    return (order[a.grid_risk_band] ?? 3) - (order[b.grid_risk_band] ?? 3);
+  }).slice(0, 15) : [];
+
+  // Tier distribution from anomaly
+  const tierDist = anomaly?.tier_distribution ? Object.entries(anomaly.tier_distribution) : [];
+  const maxTier = tierDist.length > 0 ? Math.max(...tierDist.map(([, v]) => v)) : 1;
+
+  return (
+    <div className="space-y-8 animate-fadeIn">
+      {/* KPI Strip */}
+      <section data-testid="kpi-strip">
+        {pipeLoading ? (
+          <KPISkeleton count={6} />
+        ) : pipeError ? (
+          <ErrorState message={pipeError} onRetry={pipeRetry} />
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {kpis.map((kpi, i) => (
+              <KPICard key={i} label={kpi.label} value={kpi.value} accent={kpi.accent} delay={i * 50} />
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Two columns: Grid Stress + Risk Distribution */}
+      <section className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        {/* Grid Stress Table - 60% */}
+        <div className="lg:col-span-3 min-w-0">
+          <h2 className="text-sm text-[#737373] uppercase tracking-wide font-mono mb-4">{t('Grid Stress')}</h2>
+          {gridLoading ? (
+            <TableSkeleton rows={8} cols={5} />
+          ) : gridError ? (
+            <ErrorState message={gridError} onRetry={gridRetry} />
+          ) : sortedFeeders.length === 0 ? (
+            <EmptyState message="No feeder data available" />
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-[#525252] text-xs uppercase tracking-wide border-b border-[#1A1A1A]">
+                    <th className="text-left py-2 font-normal">Feeder</th>
+                    <th className="text-left py-2 font-normal">Locality</th>
+                    <th className="text-left py-2 font-normal">Band</th>
+                    <th className="text-right py-2 font-normal">Peak Load %</th>
+                    <th className="text-right py-2 font-normal">Peak Time</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sortedFeeders.map((f, i) => (
+                    <tr
+                      key={f.feeder_id_hash || i}
+                      className="border-b border-[#1A1A1A] hover:bg-[#0A0A0A] cursor-pointer transition-colors duration-150 opacity-0 animate-fadeIn"
+                      style={{ animationDelay: `${i * 30}ms`, animationFillMode: 'forwards' }}
+                      onClick={() => navigate(`/grid?feeder=${f.feeder_id_hash}`)}
+                      data-testid={`feeder-row-${i}`}
+                    >
+                      <td className="py-2.5 font-mono text-xs text-[#FAFAFA]">{truncateHash(f.feeder_id_hash)}</td>
+                      <td className="py-2.5 text-[#737373]">{f.locality || '\u2014'}</td>
+                      <td className="py-2.5">
+                        <span className="flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full" style={{ backgroundColor: getBandColor(f.grid_risk_band) }} />
+                          <span style={{ color: getBandColor(f.grid_risk_band) }} className="text-xs font-mono">{f.grid_risk_band}</span>
+                        </span>
+                      </td>
+                      <td className="py-2.5 text-right font-mono text-[#FAFAFA]">{f.peak_load_pct != null ? `${f.peak_load_pct.toFixed(1)}%` : '\u2014'}</td>
+                      <td className="py-2.5 text-right text-[#737373] text-xs">{f.peak_time_ist || '\u2014'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        {/* Risk Distribution - 40% */}
+        <div className="lg:col-span-2">
+          <h2 className="text-sm text-[#737373] uppercase tracking-wide font-mono mb-4">Risk Distribution</h2>
+          {anomLoading ? (
+            <div className="space-y-3">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="animate-pulse bg-[#1A1A1A] h-8 rounded-sm" />
+              ))}
+            </div>
+          ) : anomError ? (
+            <ErrorState message={anomError} onRetry={anomRetry} />
+          ) : tierDist.length === 0 ? (
+            <EmptyState message="No tier data available" />
+          ) : (
+            <div className="space-y-3">
+              {tierDist.map(([tier, count], i) => (
+                <div key={tier} className="opacity-0 animate-fadeIn" style={{ animationDelay: `${i * 60}ms`, animationFillMode: 'forwards' }}>
+                  <div className="flex items-center justify-between text-xs mb-1">
+                    <span className="text-[#737373]">{cleanTierName(tier)}</span>
+                    <span className="font-mono text-[#FAFAFA]">{count}</span>
+                  </div>
+                  <div className="h-2 bg-[#1A1A1A] rounded-sm overflow-hidden">
+                    <div
+                      className="h-full rounded-sm transition-all duration-700 ease-out"
+                      style={{
+                        width: `${(count / maxTier) * 100}%`,
+                        backgroundColor: tier.includes('MULTI_SIGNAL') ? '#EF4444' : '#FAFAFA',
+                        opacity: tier.includes('MULTI_SIGNAL') ? 1 : 0.6,
+                      }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Demo Stories */}
+      <section>
+        <h2 className="text-sm text-[#737373] uppercase tracking-wide font-mono mb-4">Demo Stories</h2>
+        {demoLoading ? (
+          <div className="flex gap-4 overflow-x-auto pb-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="animate-pulse bg-[#0A0A0A] border border-[#1A1A1A] min-w-[300px] h-48 rounded-sm" />
+            ))}
+          </div>
+        ) : demoError ? (
+          <ErrorState message={demoError} onRetry={demoRetry} />
+        ) : !demoCases || demoCases.length === 0 ? (
+          <EmptyState message="No demo cases available" />
+        ) : (
+          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-thin">
+            {demoCases.map((c, i) => (
+              <div
+                key={c.case_id || i}
+                className="bg-[#0A0A0A] border border-[#1A1A1A] p-5 min-w-[300px] max-w-[340px] flex-shrink-0 flex flex-col opacity-0 animate-fadeIn hover:-translate-y-[1px] transition-transform duration-200"
+                style={{ animationDelay: `${i * 50}ms`, animationFillMode: 'forwards' }}
+              >
+                <span className="text-xs font-mono text-[#525252] uppercase tracking-wide">{c.case_tag}</span>
+                <h3 className="text-base text-white mt-2 mb-2 leading-snug">{c.demo_title}</h3>
+                <p className={`text-sm text-[#737373] flex-1 ${expandedStory === c.case_id ? '' : 'line-clamp-3'}`}>
+                  {c.demo_narrative}
+                </p>
+                {c.demo_narrative && c.demo_narrative.length > 120 && (
+                  <button
+                    onClick={() => setExpandedStory(expandedStory === c.case_id ? null : c.case_id)}
+                    className="text-xs text-[#737373] hover:text-[#FAFAFA] mt-2 text-left transition-colors"
+                  >
+                    {expandedStory === c.case_id ? 'Show less' : 'Read more'}
+                  </button>
+                )}
+                <p className="text-xs text-[#525252] italic mt-3 border-t border-[#1A1A1A] pt-3">{c.what_to_show_judge}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Health Status Footer */}
+      <section className="border-t border-[#1A1A1A] pt-4" data-testid="health-status">
+        {health ? (
+          <div className="flex items-center gap-2 text-xs text-[#525252]">
+            <div className={`w-1.5 h-1.5 rounded-full ${!health.errors || health.errors.length === 0 ? 'bg-[#22C55E]' : 'bg-[#EF4444]'}`} />
+            <span>System: {health.files_loaded}/{health.total_files} files · {health.total_records?.toLocaleString()} records · {health.load_time_seconds?.toFixed(2)}s</span>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 text-xs text-[#525252]">
+            <div className="w-1.5 h-1.5 rounded-full bg-[#525252]" />
+            <span>System status unavailable</span>
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}
